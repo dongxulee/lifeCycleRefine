@@ -1,0 +1,11 @@
+jupyter nbconvert --to notebook --execute richHighSimulation.ipynb --output richHighSimulation.ipynb
+sleep 180
+
+jupyter nbconvert --to notebook --execute richLowSimulation.ipynb --output richLowSimulation.ipynb
+sleep 180
+
+jupyter nbconvert --to notebook --execute poorHighSimulation.ipynb --output poorHighSimulation.ipynb
+sleep 180
+
+jupyter nbconvert --to notebook --execute poorLowSimulation.ipynb --output poorLowSimulation.ipynb
+sleep 180

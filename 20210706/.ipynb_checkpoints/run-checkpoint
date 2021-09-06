@@ -1,0 +1,11 @@
+python richHighCost.py
+sleep 180
+
+python richLowCost.py
+sleep 180
+
+python poorHighCost.py
+sleep 180
+
+python poorLowCost.py
+sleep 180
