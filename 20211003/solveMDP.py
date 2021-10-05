@@ -335,11 +335,12 @@ def dotProduct(p_next, uBTB):
 # define approximation of fit
 @jit
 def fit(v, xpp):
-    return vmap(partial(jnp.interp,xp = ws))(x = xpp[:,0], fp = v[:,jnp.array(xpp[:,1], dtype = int),
+    value = vmap(partial(jnp.interp,xp = ws))(x = xpp[:,0], fp = v[:,jnp.array(xpp[:,1], dtype = int),
                                                        jnp.array(xpp[:,2], dtype = int),
                                                        jnp.array(xpp[:,3], dtype = int),
                                                        jnp.array(xpp[:,4], dtype = int),
                                                        jnp.array(xpp[:,5], dtype = int)].T)
+    return jnp.nan_to_num(x = value, nan = -jnp.inf)
     
 
 
