@@ -399,12 +399,3 @@ def V_solve(t,V_next,x):
     cbkha = actions[Q.argmax()]
     return v, cbkha
 
-
-##################################################################################### solving the model
-# for t in tqdm(range(T_max-1,T_min-1, -1)):
-#     if t == T_max-1:
-#         v = vmap(partial(V,t,Vgrid[:,:,:,:,:,:,t]))(Xs)
-#     else:
-#         v = vmap(partial(V,t,Vgrid[:,:,:,:,:,:,t+1]))(Xs)
-#     Vgrid[:,:,:,:,:,:,t] = v.reshape(dim)
-# np.save("richLow",Vgrid)
