@@ -165,8 +165,8 @@ numGrid = 20
 As = np.array(np.meshgrid(np.linspace(0.001,0.999,numGrid), np.linspace(0,1,numGrid), [0,1])).T.reshape(-1,3)
 As = jnp.array(As)
 # wealth discretization
-wealthLevel = 300
-polynomialDegree = 3
+wealthLevel = 400
+polynomialDegree = 2
 ws = jnp.linspace(0, np.power(wealthLevel,1/polynomialDegree), numGrid)**polynomialDegree
 # age of last time bought a house value only count when o = 1. 
 aBuy = np.array(range(ageLimit))
