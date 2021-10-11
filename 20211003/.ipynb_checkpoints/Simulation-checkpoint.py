@@ -102,7 +102,7 @@ def generateEcon(yearBegin, yearCount,imaginedEconState,empiricalEcon):
     econRate = empiricalEcon[np.where(years == yearBegin)[0][0]:np.where(years == yearBegin)[0][0]+yearCount].values
     return econ, econRate
 #**********************************simulation change*****************************************************#
-yearBegin = 2004
+yearBegin = 1984
 yearCount = 15
 econ, econRate = generateEcon(yearBegin, yearCount,imaginedEconState,empiricalEcon)
 

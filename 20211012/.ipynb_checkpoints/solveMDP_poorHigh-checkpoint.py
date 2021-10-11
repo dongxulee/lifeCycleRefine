@@ -18,7 +18,7 @@ T_R = 45
 # discounting factor
 beta = 1/(1+0.02)
 # utility function parameter 
-gamma = 3.0
+gamma = 2.0
 # relative importance of housing consumption and non durable consumption 
 alpha = 0.7
 # parameter used to calculate the housing consumption 
@@ -166,7 +166,7 @@ As = np.array(np.meshgrid(np.linspace(0.001,0.999,numGrid), np.linspace(0,1,numG
 As = jnp.array(As)
 # wealth discretization
 wealthLevel = 300
-polynomialDegree = 3
+polynomialDegree = 1
 ws = jnp.linspace(0, np.power(wealthLevel,1/polynomialDegree), numGrid)**polynomialDegree
 # age of last time bought a house value only count when o = 1. 
 aBuy = np.array(range(ageLimit))
