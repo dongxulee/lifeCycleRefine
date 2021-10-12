@@ -52,9 +52,9 @@ detEarning = jnp.array(np.load("constant/detEarningHigh.npy"))
 # fix the deterministic income
 detEarning = jnp.concatenate([detEarning[:46], detEarning[46:]-25])
 # stock transaction fee
-Kc = 0
+Kc = 0.02
 # stock participation cost
-c_k = 5
+c_k = 20
 ############################################################################################################ high skill feature 
 # Define transition matrix of economical states S
 Ps = np.genfromtxt('constant/Ps.csv',delimiter=',')
@@ -136,6 +136,9 @@ H = 1000
 Rl = 500
 # housing price constant 
 pt = 2*250/1000
+########################################### shut down housing
+pt = jnp.inf
+###########################################
 # 30k rent 1000 sf
 pr = 2*10/1000 * 2 
 # constant cost 
@@ -401,7 +404,7 @@ def V_solve(t,V_next,x):
 
 ###################################solving the model################################################## 
 import os.path
-if os.path.exists("richLow.npy"):
+if os.path.exists("richHigh.npy"):
     print("Model Solved! ")
 else:
     for t in tqdm(range(T_max-1,T_min-1, -1)):
@@ -410,4 +413,4 @@ else:
         else:
             v = vmap(partial(V,t,Vgrid[:,:,:,:,:,:,t+1]))(Xs)
         Vgrid[:,:,:,:,:,:,t] = v.reshape(dim)
-    np.save("richLow",Vgrid)
+    np.save("richHigh",Vgrid)

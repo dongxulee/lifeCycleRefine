@@ -136,6 +136,9 @@ H = 1000
 Rl = 500
 # housing price constant 
 pt = 2*250/1000
+########################################### shut down housing
+pt = jnp.inf
+###########################################
 # 30k rent 1000 sf
 pr = 2*10/1000 * 2 
 # constant cost 

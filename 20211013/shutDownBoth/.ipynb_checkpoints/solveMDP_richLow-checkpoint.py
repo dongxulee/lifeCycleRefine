@@ -99,6 +99,9 @@ for _ in range(100):
 r_bar = 0.02
 # income fraction goes into 401k 
 yi = 0.04
+########################################### shut down 401k
+yi = 0
+###########################################
 Pa = Pa[:T_max]
 Nt = [np.sum(Pa[t:]) for t in range(T_min,T_max)]
 # factor used to calculate the withdraw amount 
@@ -136,6 +139,9 @@ H = 1000
 Rl = 500
 # housing price constant 
 pt = 2*250/1000
+########################################### shut down housing
+pt = jnp.inf
+###########################################
 # 30k rent 1000 sf
 pr = 2*10/1000 * 2 
 # constant cost 

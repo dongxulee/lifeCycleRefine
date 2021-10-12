@@ -99,6 +99,9 @@ for _ in range(100):
 r_bar = 0.02
 # income fraction goes into 401k 
 yi = 0.04
+########################################### shut down 401k
+yi = 0
+###########################################
 Pa = Pa[:T_max]
 Nt = [np.sum(Pa[t:]) for t in range(T_min,T_max)]
 # factor used to calculate the withdraw amount 

@@ -48,14 +48,14 @@ nZ = 2
 Pa = jnp.array(np.load("constant/prob.npy"))
 # deterministic income
 detEarning = jnp.array(np.load("constant/detEarningHigh.npy"))
-############################################################################################################ high skill feature 
+############################################################################################################ low skill feature 
 # fix the deterministic income
-detEarning = jnp.concatenate([detEarning[:46], detEarning[46:]-25])
+detEarning = jnp.concatenate([detEarning[:46]*0.5, detEarning[46:]-45])
 # stock transaction fee
-Kc = 0
+Kc = 0.02
 # stock participation cost
-c_k = 5
-############################################################################################################ high skill feature 
+c_k = 20
+############################################################################################################ low skill feature 
 # Define transition matrix of economical states S
 Ps = np.genfromtxt('constant/Ps.csv',delimiter=',')
 Ps = jnp.array(Ps)
@@ -99,6 +99,9 @@ for _ in range(100):
 r_bar = 0.02
 # income fraction goes into 401k 
 yi = 0.04
+########################################### shut down 401k
+yi = 0
+###########################################
 Pa = Pa[:T_max]
 Nt = [np.sum(Pa[t:]) for t in range(T_min,T_max)]
 # factor used to calculate the withdraw amount 
@@ -136,6 +139,9 @@ H = 1000
 Rl = 500
 # housing price constant 
 pt = 2*250/1000
+########################################### shut down housing
+pt = jnp.inf
+###########################################
 # 30k rent 1000 sf
 pr = 2*10/1000 * 2 
 # constant cost 
@@ -401,7 +407,7 @@ def V_solve(t,V_next,x):
 
 ###################################solving the model################################################## 
 import os.path
-if os.path.exists("richLow.npy"):
+if os.path.exists("poorHigh.npy"):
     print("Model Solved! ")
 else:
     for t in tqdm(range(T_max-1,T_min-1, -1)):
@@ -410,4 +416,4 @@ else:
         else:
             v = vmap(partial(V,t,Vgrid[:,:,:,:,:,:,t+1]))(Xs)
         Vgrid[:,:,:,:,:,:,t] = v.reshape(dim)
-    np.save("richLow",Vgrid)
+    np.save("poorHigh",Vgrid)
