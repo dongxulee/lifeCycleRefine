@@ -99,9 +99,6 @@ for _ in range(100):
 r_bar = 0.02
 # income fraction goes into 401k 
 yi = 0.04
-########################################### shut down 401k
-yi = 0
-###########################################
 Pa = Pa[:T_max]
 Nt = [np.sum(Pa[t:]) for t in range(T_min,T_max)]
 # factor used to calculate the withdraw amount 
@@ -139,9 +136,6 @@ H = 1000
 Rl = 500
 # housing price constant 
 pt = 2*250/1000
-########################################### shut down housing
-pt = jnp.inf
-###########################################
 # 30k rent 1000 sf
 pr = 2*10/1000 * 2 
 # constant cost 
@@ -277,6 +271,9 @@ def feasibleActions(t, x):
     
     # renter
     buy = As[:,2]*(t < ageLimit)
+####################################################################################################### shut down housing
+    buy = As[:,2]*0
+#######################################################################################################
     budget1 = yAT(t,x) + x[0] - buy*(H*pt*0.2 + c_h)
     h = jnp.clip(budget1*As[:,0]*(1-alpha)/pr, a_max = Rl)*(1-buy) + buy*jnp.ones(nA)*H*(1+kappa)
     c = (budget1*As[:,0] - h*pr)*(1-buy) + buy*budget1*As[:,0]

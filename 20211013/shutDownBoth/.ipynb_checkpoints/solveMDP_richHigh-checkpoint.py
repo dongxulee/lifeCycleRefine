@@ -139,9 +139,6 @@ H = 1000
 Rl = 500
 # housing price constant 
 pt = 2*250/1000
-########################################### shut down housing
-pt = jnp.inf
-###########################################
 # 30k rent 1000 sf
 pr = 2*10/1000 * 2 
 # constant cost 
@@ -277,6 +274,9 @@ def feasibleActions(t, x):
     
     # renter
     buy = As[:,2]*(t < ageLimit)
+####################################################################################################### shut down housing
+    buy = As[:,2]*0
+#######################################################################################################
     budget1 = yAT(t,x) + x[0] - buy*(H*pt*0.2 + c_h)
     h = jnp.clip(budget1*As[:,0]*(1-alpha)/pr, a_max = Rl)*(1-buy) + buy*jnp.ones(nA)*H*(1+kappa)
     c = (budget1*As[:,0] - h*pr)*(1-buy) + buy*budget1*As[:,0]
