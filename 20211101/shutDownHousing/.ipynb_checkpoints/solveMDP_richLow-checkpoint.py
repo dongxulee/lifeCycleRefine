@@ -46,11 +46,9 @@ nZ = 2
 
 # probability of survival
 Pa = jnp.array(np.load("constant/prob.npy"))
-# deterministic income
-detEarning = jnp.array(np.load("constant/detEarningHigh.npy"))
 ############################################################################################################ high skill feature 
-# fix the deterministic income
-detEarning = jnp.concatenate([detEarning[:46], detEarning[46:]-25])
+# deterministic income
+detEarning = jnp.array(np.load("constant/highIncomeDetermined.npy"))
 # stock transaction fee
 Kc = 0
 # stock participation cost

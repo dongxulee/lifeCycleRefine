@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import jax.numpy as jnp
 from jax.numpy import interp
 from jax import jit, partial, random, vmap
@@ -6,7 +7,6 @@ from tqdm import tqdm
 import warnings
 warnings.filterwarnings("ignore")
 np.printoptions(precision=2)
-
 
 '''
     Constants 
@@ -46,14 +46,18 @@ nZ = 2
 
 # probability of survival
 Pa = jnp.array(np.load("constant/prob.npy"))
-############################################################################################################ low skill feature 
 # deterministic income
-detEarning = jnp.array(np.load("constant/lowIncomeDetermined.npy"))
+detEarning = jnp.array(np.load("constant/detEarningHigh.npy"))
+############################################################################################################ high skill feature 
+# rescale the deterministic income
+detEarning = detEarning 
+# fix the deterministic income
+detEarning = jnp.concatenate([detEarning[:46], detEarning[46:]-25])
 # stock transaction fee
-Kc = 0.02
+Kc = 0
 # stock participation cost
-c_k = 20
-############################################################################################################ low skill feature 
+c_k = 5
+############################################################################################################ high skill feature 
 # Define transition matrix of economical states S
 Ps = np.genfromtxt('constant/Ps.csv',delimiter=',')
 Ps = jnp.array(Ps)
@@ -69,6 +73,39 @@ r_k = gkfe[:,2]/100
 # unemployment rate depending on current S state 
 Pe = gkfe[:,7:]/100
 Pe = Pe[:,::-1]
+
+
+'''
+    Real Econ Shock calibration
+'''
+
+# empirical econ
+empiricalEcon = pd.read_csv('constant/empiricalEcon.csv',delimiter=',')
+empiricalEcon = empiricalEcon.set_index("year")
+empiricalEcon = empiricalEcon/100
+# match the empirical states in memoryState
+memoryState = np.column_stack((gGDP, r_k, r_b))
+def similarity(actualState, memoryState = memoryState):
+    '''
+        state is charactorized as 3 dim vector
+    '''
+    diffState = np.sum(np.abs(actualState - memoryState), axis = 1)
+    distance = np.min(diffState)
+    state = np.argmin(diffState)
+    return distance, state
+similarity, imaginedEconState = np.vectorize(similarity, signature='(n)->(),()')(empiricalEcon.values)
+# generate economic states of a certain time window
+def generateEcon(yearBegin, yearCount,imaginedEconState,empiricalEcon):
+    # single economy generation
+    years = empiricalEcon.index.values
+    econ = jnp.array(imaginedEconState[np.where(years == yearBegin)[0][0]:np.where(years == yearBegin)[0][0]+yearCount],dtype = int)
+    econRate = empiricalEcon[np.where(years == yearBegin)[0][0]:np.where(years == yearBegin)[0][0]+yearCount].values
+    return econ, econRate
+#**********************************simulation change*****************************************************#
+yearBegin = 1984
+yearCount = 15
+econ, econRate = generateEcon(yearBegin, yearCount,imaginedEconState,empiricalEcon)
+
 
 
 '''
@@ -97,9 +134,6 @@ for _ in range(100):
 r_bar = 0.02
 # income fraction goes into 401k 
 yi = 0.04
-########################################### shut down 401k
-yi = 0
-###########################################
 Pa = Pa[:T_max]
 Nt = [np.sum(Pa[t:]) for t in range(T_min,T_max)]
 # factor used to calculate the withdraw amount 
@@ -167,7 +201,7 @@ As = np.array(np.meshgrid(np.linspace(0.001,0.999,numGrid), np.linspace(0,1,numG
 As = jnp.array(As)
 # wealth discretization
 wealthLevel = 300
-polynomialDegree = 2
+polynomialDegree = 3
 ws = jnp.linspace(0, np.power(wealthLevel,1/polynomialDegree), numGrid)**polynomialDegree
 # age of last time bought a house value only count when o = 1. 
 aBuy = np.array(range(ageLimit))
@@ -195,6 +229,8 @@ nA = As.shape[0]
 '''
     Functions Definitions
 '''
+# GDP growth depending on current S state
+gGDP = jnp.array(econRate[:,0])
 #Define the earning function, which applies for both employment status and 8 econ states
 @partial(jit, static_argnums=(0,))
 def y(t, x):
@@ -203,7 +239,8 @@ def y(t, x):
         x = [0,1, 2,3,4,5]
     '''
     if t < T_R:
-        return detEarning[t] * (1+gGDP[jnp.array(x[2], dtype = jnp.int8)]) * x[3] + (1-x[3]) * welfare
+#**********************************simulation change*****************************************************#
+        return detEarning[t] * (1+gGDP[t]) * x[3] + (1-x[3]) * welfare
     else:
         return detEarning[-1]
     
@@ -272,9 +309,6 @@ def feasibleActions(t, x):
     
     # renter
     buy = As[:,2]*(t < ageLimit)
-####################################################################################################### shut down housing
-    buy = As[:,2]*0
-#######################################################################################################
     budget1 = yAT(t,x) + x[0] - buy*(H*pt*0.2 + c_h)
     h = jnp.clip(budget1*As[:,0]*(1-alpha)/pr, a_max = Rl)*(1-buy) + buy*jnp.ones(nA)*H*(1+kappa)
     c = (budget1*As[:,0] - h*pr)*(1-buy) + buy*budget1*As[:,0]
@@ -402,16 +436,11 @@ def V_solve(t,V_next,x):
     cbkha = actions[Q.argmax()]
     return v, cbkha
 
-
-###################################solving the model################################################## 
-import os.path
-if os.path.exists("poorHigh.npy"):
-    print("Model Solved! ")
-else:
-    for t in tqdm(range(T_max-1,T_min-1, -1)):
-        if t == T_max-1:
-            v = vmap(partial(V,t,Vgrid[:,:,:,:,:,:,t]))(Xs)
-        else:
-            v = vmap(partial(V,t,Vgrid[:,:,:,:,:,:,t+1]))(Xs)
-        Vgrid[:,:,:,:,:,:,t] = v.reshape(dim)
-    np.save("poorHigh",Vgrid)
+##################################################################################### solving the model
+# for t in tqdm(range(T_max-1,T_min-1, -1)):
+#     if t == T_max-1:
+#         v = vmap(partial(V,t,Vgrid[:,:,:,:,:,:,t]))(Xs)
+#     else:
+#         v = vmap(partial(V,t,Vgrid[:,:,:,:,:,:,t+1]))(Xs)
+#     Vgrid[:,:,:,:,:,:,t] = v.reshape(dim)
+# np.save("richLow",Vgrid)
