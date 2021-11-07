@@ -101,7 +101,7 @@ def generateEcon(yearBegin, yearCount,imaginedEconState,empiricalEcon):
     return econ, econRate
 #**********************************simulation change*****************************************************#
 yearBegin = 1999
-yearCount = 2
+yearCount = 20
 econ, econRate = generateEcon(yearBegin, yearCount,imaginedEconState,empiricalEcon)
 
 
@@ -408,7 +408,7 @@ def V(t,V_next,x):
     v = Q.max()
     return v
 
-@partial(jit, static_argnums=(0,))
+# @partial(jit, static_argnums=(0,))
 def V_solve(t,V_next,x):
     '''
     x = [w,ab,s,e,o,z]

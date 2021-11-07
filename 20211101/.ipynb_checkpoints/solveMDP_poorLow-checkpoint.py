@@ -101,7 +101,7 @@ def generateEcon(yearBegin, yearCount,imaginedEconState,empiricalEcon):
     return econ, econRate
 #**********************************simulation change*****************************************************#
 yearBegin = 1999
-yearCount = 2
+yearCount = 20
 econ, econRate = generateEcon(yearBegin, yearCount,imaginedEconState,empiricalEcon)
 
 
