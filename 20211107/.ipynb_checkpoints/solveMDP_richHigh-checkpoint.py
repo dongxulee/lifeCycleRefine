@@ -3,7 +3,9 @@ import jax.numpy as jnp
 from jax.numpy import interp
 from jax import jit, partial, random, vmap
 from tqdm import tqdm
+import pandas as pd
 import warnings
+import os.path
 warnings.filterwarnings("ignore")
 np.printoptions(precision=2)
 
@@ -46,11 +48,9 @@ nZ = 2
 
 # probability of survival
 Pa = jnp.array(np.load("constant/prob.npy"))
-# deterministic income
-detEarning = jnp.array(np.load("constant/detEarningHigh.npy"))
 ############################################################################################################ high skill feature 
-# fix the deterministic income
-detEarning = jnp.concatenate([detEarning[:46], detEarning[46:]-25])
+# deterministic income
+detEarning = jnp.array(np.load("constant/highIncomeDetermined.npy"))
 # stock transaction fee
 Kc = 0.02
 # stock participation cost
@@ -71,6 +71,38 @@ r_k = gkfe[:,2]/100
 # unemployment rate depending on current S state 
 Pe = gkfe[:,7:]/100
 Pe = Pe[:,::-1]
+
+
+'''
+    Real Econ Shock calibration
+'''
+
+# # empirical econ
+# empiricalEcon = pd.read_csv('constant/empiricalEcon.csv',delimiter=',')
+# empiricalEcon = empiricalEcon.set_index("year")
+# empiricalEcon = empiricalEcon/100
+# # match the empirical states in memoryState
+# memoryState = np.column_stack((gGDP, r_k, r_b))
+# def similarity(actualState, memoryState = memoryState):
+#     '''
+#         state is charactorized as 3 dim vector
+#     '''
+#     diffState = np.sum(np.abs(actualState - memoryState), axis = 1)
+#     distance = np.min(diffState)
+#     state = np.argmin(diffState)
+#     return distance, state
+# similarity, imaginedEconState = np.vectorize(similarity, signature='(n)->(),()')(empiricalEcon.values)
+# # generate economic states of a certain time window
+# def generateEcon(yearBegin, yearCount,imaginedEconState,empiricalEcon):
+#     # single economy generation
+#     years = empiricalEcon.index.values
+#     econ = jnp.array(imaginedEconState[np.where(years == yearBegin)[0][0]:np.where(years == yearBegin)[0][0]+yearCount],dtype = int)
+#     econRate = empiricalEcon[np.where(years == yearBegin)[0][0]:np.where(years == yearBegin)[0][0]+yearCount].values
+#     return econ, econRate
+# #**********************************simulation change*****************************************************#
+# yearBegin = 1999
+# yearCount = 20
+# econ, econRate = generateEcon(yearBegin, yearCount,imaginedEconState,empiricalEcon)
 
 
 '''
@@ -194,6 +226,8 @@ nA = As.shape[0]
 '''
     Functions Definitions
 '''
+# GDP growth depending on current S state
+#gGDP = jnp.array(econRate[:,0])
 #Define the earning function, which applies for both employment status and 8 econ states
 @partial(jit, static_argnums=(0,))
 def y(t, x):
@@ -202,6 +236,9 @@ def y(t, x):
         x = [0,1, 2,3,4,5]
     '''
     if t < T_R:
+#         if os.path.exists("richHigh.npy"):
+#             return detEarning[t] * (1+gGDP[t]) * x[3] + (1-x[3]) * welfare
+#         else:
         return detEarning[t] * (1+gGDP[jnp.array(x[2], dtype = jnp.int8)]) * x[3] + (1-x[3]) * welfare
     else:
         return detEarning[-1]
@@ -400,7 +437,6 @@ def V_solve(t,V_next,x):
 
 
 ###################################solving the model################################################## 
-import os.path
 if os.path.exists("richHigh.npy"):
     print("Model Solved! ")
 else:
