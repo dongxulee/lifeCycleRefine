@@ -1,0 +1,32 @@
+****** PSID DATA CENTER ************************* 
+****** Variable labels for JobID = 293658 ******* 
+
+Variable    Labels
+
+ER47301    RELEASE NUMBER                          
+ER47302    2011 FAMILY INTERVIEW (ID) NUMBER       
+ER47307    FAMILY COMPOSITION CHANGE               
+ER47316    # IN FU                                 
+ER47317    AGE OF HEAD                             
+ER47323    HEAD MARITAL STATUS                     
+ER47329    A19 OWN/RENT OR WHAT                    
+ER47448    BC1 EMPLOYMENT STATUS-1ST MENTION       
+ER48911    W28 AMT ALL ACCOUNTS                    
+ER51904    L40 RACE OF HEAD-MENTION 1              
+ER51958    L73 INDUSTRY 1ST FULL TIME JOB-HD       
+ER52237    LABOR INCOME OF HEAD-2010               
+ER52249    LABOR INCOME OF WIFE-2010               
+ER52356    IMP WTR STOCKS (W15) 11                 
+ER52358    IMP VALUE STOCKS (W16) 11               
+ER52368    IMP VALUE ANNUITY/IRA (W22) 11          
+ER52392    IMP WEALTH W/O EQUITY (WEALTH1) 11      
+ER52394    IMP WEALTH W/ EQUITY (WEALTH2) 11       
+ER52395A1  FOOD EXPENDITURE 2011                   
+ER52395A5  HOUSING EXPENDITURE 2011                
+ER52395B7  TRANSPORTATION EXPENDITURE 2011         
+ER52395D1  EDUCATION EXPENDITURE 2010              
+ER52395D2  CHILDCARE EXPENDITURE 2010              
+ER52395D3  HEALTH CARE EXPENDITURE 2011            
+ER52405    COMPLETED ED-HD                         
+
+*** End of labels ******************************* 
