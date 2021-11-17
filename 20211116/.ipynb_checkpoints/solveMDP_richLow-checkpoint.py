@@ -173,7 +173,7 @@ pt = 2*250/1000
 pr = 2*10/1000 * 2 
 # constant cost 
 c_h = 5
-c_s = H*pt*0.4
+c_s = H*pt*0.1
 # Dm is used to update the mortgage payment
 Dm = [(1+rh) - rh*(1+rh)**(T_max - t)/((1+rh)**(T_max-t)-1) for t in range(T_min, T_max)]
 Dm[-1] = 0
@@ -295,9 +295,9 @@ def feasibleActions(t, x):
     # last term is the tax deduction of the interest portion of mortgage payment
     payment = ((t-ab) > 0)*((t-ab) <= mortgageLength)*(((t<=T_R)*tau_L + (t>T_R)*tau_R)*Ms[t-ab]*rh - m)
     # this is the fire sell term, as long as we could afford the payment, do not sell
-    sell = (yAT(t,x) + x[0] + payment > 0)*jnp.zeros(nA) + (yAT(t,x) + x[0] + payment <= 0)*jnp.ones(nA)
+    sell = (yAT(t,x) + x[0] + payment > 0)*sell + (yAT(t,x) + x[0] + payment <= 0)*jnp.ones(nA)
     budget1 = yAT(t,x) + x[0] + (1-sell)*payment + sell*(H*pt - Ms[t-ab] - c_s)
-    h = jnp.ones(nA)*H*(1+kappa)*(1-sell) + sell*jnp.clip(budget1*As[:,0]*(1-alpha)/pr, a_max = Rl)
+    h = H*(1+kappa)*(1-sell) + sell*jnp.clip(budget1*As[:,0]*(1-alpha)/pr, a_max = Rl)
     c = budget1*As[:,0]*(1-sell) + sell*(budget1*As[:,0] - h*pr)
     budget2 = budget1*(1-As[:,0])
     k = budget2*As[:,1]
@@ -404,7 +404,7 @@ def V(t,V_next,x):
         Q = R(actions) + beta * dotProduct(xp[:,6], bequeathU)
     else:
         Q = R(actions) + beta * dotProduct(xp[:,6], Pa[t]*fit(V_next, xp) + (1-Pa[t])*bequeathU)
-    Q = Q + (-jnp.inf)*(x[1] >= t)
+    Q = Q + (-jnp.inf)*((x[1] >= t) * (x[4] == 1))
     v = Q.max()
     return v
 
@@ -431,7 +431,7 @@ def V_solve(t,V_next,x):
         Q = R(actions) + beta * dotProduct(xp[:,6], bequeathU)
     else:
         Q = R(actions) + beta * dotProduct(xp[:,6], Pa[t]*fit(V_next, xp) + (1-Pa[t])*bequeathU)
-    Q = Q + (-jnp.inf)*(x[1] >= t)
+    Q = Q + (-jnp.inf)*((x[1] >= t) * (x[4] == 1))
     v = Q.max()
     cbkha = actions[Q.argmax()]
     return v, cbkha

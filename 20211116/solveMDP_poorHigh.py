@@ -297,7 +297,7 @@ def feasibleActions(t, x):
     # this is the fire sell term, as long as we could afford the payment, do not sell
     sell = (yAT(t,x) + x[0] + payment > 0)*jnp.zeros(nA) + (yAT(t,x) + x[0] + payment <= 0)*jnp.ones(nA)
     budget1 = yAT(t,x) + x[0] + (1-sell)*payment + sell*(H*pt - Ms[t-ab] - c_s)
-    h = jnp.ones(nA)*H*(1+kappa)*(1-sell) + sell*jnp.clip(budget1*As[:,0]*(1-alpha)/pr, a_max = Rl)
+    h = H*(1+kappa)*(1-sell) + sell*jnp.clip(budget1*As[:,0]*(1-alpha)/pr, a_max = Rl)
     c = budget1*As[:,0]*(1-sell) + sell*(budget1*As[:,0] - h*pr)
     budget2 = budget1*(1-As[:,0])
     k = budget2*As[:,1]
