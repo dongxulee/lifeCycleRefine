@@ -25,7 +25,7 @@ for beta_r in Beta_r:
         
         print("agentType: ", agentType)
         print("beta: ", beta)
-        print("gamma: "gamma)
+        print("gamma: ", gamma)
 
         # time line, starts at 20 ends at 80
         T_min = 0
@@ -455,7 +455,7 @@ for beta_r in Beta_r:
 
 
         ###################################solving the model################################################## 
-        fileName = agentType + "_" + str(beta) + "_" + str(gamma)
+        fileName = agentType + "_" + str(beta_r) + "_" + str(gamma)
         if os.path.exists(fileName + ".npy"):
             print("Model Solved! ")
         else:
@@ -465,4 +465,4 @@ for beta_r in Beta_r:
                 else:
                     v = vmap(partial(V,t,Vgrid[:,:,:,:,:,:,t+1]))(Xs)
                 Vgrid[:,:,:,:,:,:,t] = v.reshape(dim)
-            np.save(agentType,Vgrid)
+            np.save(fileName,Vgrid)

@@ -25,7 +25,7 @@ for beta_r in Beta_r:
         
         print("agentType: ", agentType)
         print("beta: ", beta)
-        print("gamma: "gamma)
+        print("gamma: ", gamma)
 
         # time line, starts at 20 ends at 80
         T_min = 0
@@ -90,38 +90,6 @@ for beta_r in Beta_r:
         # unemployment rate depending on current S state 
         Pe = gkfe[:,7:]/100
         Pe = Pe[:,::-1]
-
-
-        '''
-            Real Econ Shock calibration
-        '''
-
-        # # empirical econ
-        # empiricalEcon = pd.read_csv('constant/empiricalEcon.csv',delimiter=',')
-        # empiricalEcon = empiricalEcon.set_index("year")
-        # empiricalEcon = empiricalEcon/100
-        # # match the empirical states in memoryState
-        # memoryState = np.column_stack((gGDP, r_k, r_b))
-        # def similarity(actualState, memoryState = memoryState):
-        #     '''
-        #         state is charactorized as 3 dim vector
-        #     '''
-        #     diffState = np.sum(np.abs(actualState - memoryState), axis = 1)
-        #     distance = np.min(diffState)
-        #     state = np.argmin(diffState)
-        #     return distance, state
-        # similarity, imaginedEconState = np.vectorize(similarity, signature='(n)->(),()')(empiricalEcon.values)
-        # # generate economic states of a certain time window
-        # def generateEcon(yearBegin, yearCount,imaginedEconState,empiricalEcon):
-        #     # single economy generation
-        #     years = empiricalEcon.index.values
-        #     econ = jnp.array(imaginedEconState[np.where(years == yearBegin)[0][0]:np.where(years == yearBegin)[0][0]+yearCount],dtype = int)
-        #     econRate = empiricalEcon[np.where(years == yearBegin)[0][0]:np.where(years == yearBegin)[0][0]+yearCount].values
-        #     return econ, econRate
-        # #**********************************simulation change*****************************************************#
-        # yearBegin = 1999
-        # yearCount = 20
-        # econ, econRate = generateEcon(yearBegin, yearCount,imaginedEconState,empiricalEcon)
 
 
 
@@ -455,7 +423,7 @@ for beta_r in Beta_r:
 
 
         ###################################solving the model################################################## 
-        fileName = agentType + "_" + str(beta) + "_" + str(gamma)
+        fileName = agentType + "_" + str(beta_r) + "_" + str(gamma)
         if os.path.exists(fileName + ".npy"):
             print("Model Solved! ")
         else:
@@ -465,4 +433,4 @@ for beta_r in Beta_r:
                 else:
                     v = vmap(partial(V,t,Vgrid[:,:,:,:,:,:,t+1]))(Xs)
                 Vgrid[:,:,:,:,:,:,t] = v.reshape(dim)
-            np.save(agentType,Vgrid)
+            np.save(fileName,Vgrid)
