@@ -11,7 +11,7 @@ np.printoptions(precision=2)
 
 AgentType = ["poorHigh","poorLow","richHigh","richLow"]
 Beta_r = [0.01]
-Gamma = [3.0, 4.0, 5.0]
+Gamma = [3.0]
 
 for ga in Gamma:
     for beta_r in Beta_r:
@@ -42,7 +42,7 @@ for ga in Gamma:
             # parameter used to calculate the housing consumption 
             kappa = 0.3
             # uB associated parameter
-            B = 2
+            B = 1.2
             # social welfare after the unemployment
             welfare = 20
             # tax rate before and after retirement
