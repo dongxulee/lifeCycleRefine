@@ -488,7 +488,7 @@ for ga in Gamma:
                 w_next = ((1+bondReturn[t])*b + (1+stockReturn[t])*k).repeat(nE)
                 ab_next = (1-x[4])*(t*(action == 1)).repeat(nE) + x[4]*(x[1]*jnp.ones(nE))
                 s_next = econ[t+1].repeat(nE)
-                e_next = jnp.array([e,(1-e)])*(t<T_R) + jnp.array([0,0])*(t>=T_R)
+                e_next = jnp.array([e,(1-e)])*(t+age-20<T_R) + jnp.array([0,0])*(t+age-20>=T_R)
                 z_next = x[5]*jnp.ones(nE) + ((1-x[5]) * (k > 0)).repeat(nE)
                 # job status changing probability and econ state transition probability
                 pe = Pe[s, e]

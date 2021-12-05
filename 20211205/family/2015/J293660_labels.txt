@@ -1,0 +1,32 @@
+****** PSID DATA CENTER ************************* 
+****** Variable labels for JobID = 293660 ******* 
+
+Variable    Labels
+
+ER60001    RELEASE NUMBER                          
+ER60002    2015 FAMILY INTERVIEW (ID) NUMBER       
+ER60007    FAMILY COMPOSITION CHANGE               
+ER60016    # IN FU                                 
+ER60017    AGE OF HEAD                             
+ER60024    HEAD MARITAL STATUS                     
+ER60030    A19 OWN/RENT OR WHAT                    
+ER60163    BC1 EMPLOYMENT STATUS-1ST MENTION       
+ER61772    W28 AMT ALL ACCOUNTS                    
+ER64810    L40 RACE OF HEAD-MENTION 1              
+ER64874    L73 INDUSTRY 1ST FULL TIME JOB-HD       
+ER65216    LABOR INCOME OF HEAD-2014               
+ER65244    LABOR INCOME OF SPOUSE-2014             
+ER65366    IMP WTR STOCKS (W15) 2015               
+ER65368    IMP VALUE STOCKS (W16) 2015             
+ER65378    IMP VALUE ANNUITY/IRA (W22) 2015        
+ER65406    IMP WEALTH W/O EQUITY (WEALTH1) 2015    
+ER65408    IMP WEALTH W/ EQUITY (WEALTH2) 2015     
+ER65410    FOOD EXPENDITURE 2015                   
+ER65414    HOUSING EXPENDITURE 2015                
+ER65425    TRANSPORTATION EXPENDITURE 2015         
+ER65437    EDUCATION EXPENDITURE 2014              
+ER65438    CHILDCARE EXPENDITURE 2014              
+ER65439    HEALTH CARE EXPENDITURE 2015            
+ER65459    COMPLETED ED-HD                         
+
+*** End of labels ******************************* 
