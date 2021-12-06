@@ -38,7 +38,7 @@ for ga in Gamma:
             T_max = 60
             T_R = 45
             # relative importance of housing consumption and non durable consumption 
-            alpha = 0.95
+            alpha = 0.5
             # parameter used to calculate the housing consumption 
             kappa = 0.3
             # uB associated parameter
