@@ -215,7 +215,7 @@ for beta_r in Beta_r:
         # actions dicretization(hp, cp, kp)
         numGrid = 20
         #As = np.array(np.meshgrid(np.linspace(0.001,0.999,numGrid), np.linspace(0,1,numGrid), [0,1])).T.reshape(-1,3)
-        As = np.array(np.meshgrid([0.65], [0.25], [0,1])).T.reshape(-1,3)
+        As = np.array(np.meshgrid([0.50], [0.25], [0,1])).T.reshape(-1,3)
         As = jnp.array(As)
         # wealth discretization
         wealthLevel = 300
