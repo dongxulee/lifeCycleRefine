@@ -1,6 +1,7 @@
 import numpy as np
 import jax.numpy as jnp
-from jax import jit, partial, random, vmap
+from jax import jit, random, vmap
+from functools import partial
 from tqdm import tqdm
 import pandas as pd
 import warnings

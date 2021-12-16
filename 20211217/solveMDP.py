@@ -1,7 +1,7 @@
 import numpy as np
 import jax.numpy as jnp
-from jax.numpy import interp
-from jax import jit, partial, random, vmap
+from jax import jit, vmap
+from functools import partial
 from tqdm import tqdm
 import warnings
 import os.path
@@ -379,6 +379,8 @@ def solveMDP(beta_r, agentType, gamma):
             Q = R(t, actions) + beta * dotProduct(xp[:,6], Pa[t]*fit(V_next, xp) + (1-Pa[t])*bequeathU)
         v = Q.max()
         return v
+
+
     ###################################solving the model################################################## 
     fileName = agentType + "_" + str(beta_r) + "_" + str(gamma)
     if os.path.exists(fileName + ".npy"):
