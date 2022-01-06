@@ -7,8 +7,8 @@ Beta_r = [0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.10]
 Gamma = [3.0, 4.0]
 
 def mapOverBeta(beta_r):
-    for agentType in AgentType:
-        for gamma in Gamma:
+    for gamma in Gamma:
+        for agentType in AgentType:
             fileName = agentType + "_" + str(beta_r) + "_" + str(gamma)
             if os.path.exists("waseozcbkhm_" + fileName + ".npy"):
                 break 
