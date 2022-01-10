@@ -17,5 +17,5 @@ def mapOverType(agentType):
             print("gamma: ", gamma)
             solveMDP(beta_r, agentType, gamma)
 
-p = Pool(4)        
+p = Pool(4)
 p.map(mapOverType, AgentType)

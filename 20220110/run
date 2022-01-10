@@ -1,5 +1,13 @@
+rm *.npy
+
+sleep 10 
+
 python solveMDP_agentType.py
 
 sleep 180
 
 python simulation_betas.py
+
+sleep 180
+
+python simulationCrossAge_betas.py
