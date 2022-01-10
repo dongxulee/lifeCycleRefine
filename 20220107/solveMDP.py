@@ -18,7 +18,7 @@ def solveMDP(beta_r, agentType, gamma):
     T_min = 0
     T_max = 60
     T_R = 45
-    # relative importance of housing consumption and non durable consumption 
+    # relative importance of housing consumption and non-durable consumption 
     alpha = 0.7
     # parameter used to calculate the housing consumption 
     kappa = 0.3
