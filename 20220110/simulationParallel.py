@@ -1,14 +1,9 @@
 import numpy as np
 import jax.numpy as jnp
-from jax import jit, vmap
+from jax import jit, random, vmap
 from functools import partial
-from tqdm import tqdm
-import os.path
 
-def solveMDP(beta_r, agentType, ga):
-    '''
-        Input: beta_r, agentType, gamma
-    '''
+def simulation(beta_r, agentType, ga, fileName):
     # risk tolerance parameter 
     gamma = ga 
     # discounting factor
@@ -343,10 +338,8 @@ def solveMDP(beta_r, agentType, ga):
                                                             jnp.array(xpp[:,5], dtype = int)].T)
         return jnp.nan_to_num(x = value, nan = -jnp.inf)
 
-
-
     @partial(jit, static_argnums=(0,))
-    def V(t,V_next,x):
+    def V_solve(t,V_next,x):
         '''
         x = [w,ab,s,e,o,z]
         x = [0,1, 2,3,4,5]
@@ -369,16 +362,102 @@ def solveMDP(beta_r, agentType, ga):
         else:
             Q = R(t, actions) + beta * dotProduct(xp[:,6], Pa[t]*fit(V_next, xp) + (1-Pa[t])*bequeathU)
         v = Q.max()
-        return v
-    ###################################solving the model################################################## 
-    fileName = agentType + "_" + str(beta_r) + "_" + str(gamma)
-    if os.path.exists(fileName + ".npy"):
-        print("Model Solved! ")
-    else:
-        for t in tqdm(range(T_max-1,T_min-1, -1)):
+        cbkha = actions[Q.argmax()]
+        return v, cbkha
+    ##################################################################################### main function part 
+    Vgrid = np.load(fileName + ".npy")
+    # total number of agents
+    num = 10000
+    '''
+        x = [w,ab,s,e,o,z]
+        x = [5,0, 0,0,0,0]
+    '''
+    from quantecon import MarkovChain
+    # number of economies and each economy has 100 agents
+    numEcon = 100
+    numAgents = num//100
+    mc = MarkovChain(Ps)
+    econStates = mc.simulate(ts_length=T_max-T_min,init=0,num_reps=numEcon)
+    econStates = jnp.array(econStates,dtype = int)
+    
+    @partial(jit, static_argnums=(0,))
+    def transition_real(t,a,x, s_prime):
+        '''
+            Input:
+                x = [w,ab,s,e,o,z] single action 
+                x = [0,1, 2,3,4,5] 
+                a = [c,b,k,h,action] single state
+                a = [0,1,2,3,4]
+            Output:
+                w_next
+                ab_next
+                s_next
+                e_next
+                o_next
+                z_next
+                
+                prob_next
+        '''
+        s = jnp.array(x[2], dtype = jnp.int8)
+        e = jnp.array(x[3], dtype = jnp.int8)
+        # actions taken
+        b = a[1]
+        k = a[2]
+        action = a[4]
+        w_next = ((1+r_b[s])*b + (1+r_k[s_prime])*k).repeat(nE)
+        ab_next = (1-x[4])*(t*(action == 1)).repeat(nE) + x[4]*(x[1]*jnp.ones(nE))
+        s_next = s_prime.repeat(nE)
+        e_next = jnp.array([e,(1-e)])
+        z_next = x[5]*jnp.ones(nE) + ((1-x[5]) * (k > 0)).repeat(nE)
+        # job status changing probability and econ state transition probability
+        pe = Pe[s, e]
+        prob_next = jnp.array([1-pe, pe])
+        # owner
+        o_next_own = (x[4] - action).repeat(nE)
+        # renter
+        o_next_rent = action.repeat(nE)
+        o_next = x[4] * o_next_own + (1-x[4]) * o_next_rent   
+        return jnp.column_stack((w_next,ab_next,s_next,e_next,o_next,z_next,prob_next))
+
+
+    def simulation(key):
+        initE = random.choice(a = nE, p=E_distribution, key = key)
+        initS = random.choice(a = nS, p=S_distribution, key = key) 
+        x = [5, 0, initS, initE, 0, 0]
+        path = []
+        move = []
+        # first 100 agents are in the 1st economy and second 100 agents are in the 2nd economy 
+        econ = econStates[key.sum()//numAgents,:]
+        for t in range(T_min, T_max):
+            _, key = random.split(key)
             if t == T_max-1:
-                v = vmap(partial(V,t,Vgrid[:,:,:,:,:,:,t]))(Xs)
+                _,a = V_solve(t,Vgrid[:,:,:,:,:,:,t],x)
             else:
-                v = vmap(partial(V,t,Vgrid[:,:,:,:,:,:,t+1]))(Xs)
-            Vgrid[:,:,:,:,:,:,t] = v.reshape(dim)
-        np.save(fileName,Vgrid)
+                _,a = V_solve(t,Vgrid[:,:,:,:,:,:,t+1],x)
+            xp = transition_real(t,a,x, econ[t])            
+            p = xp[:,-1]
+            x_next = xp[:,:-1]
+            path.append(x)
+            move.append(a)
+            x = x_next[random.choice(a = nE, p=p, key = key)]
+        path.append(x)
+        return jnp.array(path), jnp.array(move)
+
+    # simulation part 
+    keys = vmap(random.PRNGKey)(jnp.arange(num))
+    Paths, Moves = vmap(simulation)(keys)
+    # x = [w,ab,s,e,o,z]
+    # x = [0,1, 2,3,4,5]
+    _ws = Paths[:,:,0].T
+    _ab = Paths[:,:,1].T
+    _ss = Paths[:,:,2].T
+    _es = Paths[:,:,3].T
+    _os = Paths[:,:,4].T
+    _zs = Paths[:,:,5].T
+    _cs = Moves[:,:,0].T
+    _bs = Moves[:,:,1].T
+    _ks = Moves[:,:,2].T
+    _hs = Moves[:,:,3].T
+    _ms = Ms[jnp.append(jnp.array([0]),jnp.arange(T_max)).reshape(-1,1) - jnp.array(_ab, dtype = jnp.int8)]*_os
+    
+    np.save("parallel_waseozcbkhm_" + fileName, np.array([_ws,_ab,_ss,_es,_os,_zs,_cs,_bs,_ks,_hs,_ms]))

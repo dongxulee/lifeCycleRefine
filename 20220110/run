@@ -1,1 +1,9 @@
-python simulationCrossAge_betas.py
+python solveMDP_agentType.py 
+
+sleep 60
+
+python simulation_betas.py
+
+sleep 60
+
+python simulationParallel_betas.py

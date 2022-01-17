@@ -1,4 +1,4 @@
-from simulationCrossAge import *
+from simulationParallel import *
 import os.path
 from multiprocessing import Pool 
 
@@ -10,7 +10,7 @@ def mapOverBeta(beta_r):
     for gamma in Gamma:
         for agentType in AgentType:
             fileName = agentType + "_" + str(beta_r) + "_" + str(gamma)
-            if os.path.exists("crossAge_waseozcbkhm_" + fileName + ".npy"):
+            if os.path.exists("parallel_waseozcbkhm_" + fileName + ".npy"):
                 break 
             if not os.path.exists(fileName + ".npy"):
                 break
