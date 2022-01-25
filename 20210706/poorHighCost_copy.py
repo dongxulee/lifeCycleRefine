@@ -2,7 +2,7 @@ import numpy as np
 import jax.numpy as jnp
 from jax.scipy.ndimage import map_coordinates
 import warnings
-from jax import jit, partial, random, vmap
+from jax import jit, random, vmap
 from tqdm import tqdm
 warnings.filterwarnings("ignore")
 np.printoptions(precision=2)

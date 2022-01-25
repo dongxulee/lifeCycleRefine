@@ -418,7 +418,7 @@ def simulation(beta_r, agentType, ga, fileName):
         # agentType = "porrLow":
         df = df_1999[(df_1999["skillLevel"] == "Low")&(df_1999["financeExperience"] == "Yes")]
     
-    df["ab"] = 30
+    df["ab"] = 25
     df["wealth"] = df["liquidWealth"] + df["investmentAmount"]
     codes = {'employed':1, 'unemployed': 0, "retired": 0}
     df["employmentStatus"] = df["employmentStatus"].map(codes)
