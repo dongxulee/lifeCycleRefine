@@ -1,0 +1,18 @@
+cd 20220201
+bash run
+cd ..
+sleep 60
+
+cd 20220202 
+bash run
+cd ..
+sleep 60
+
+cd 20220203
+bash run
+cd ..
+sleep 60
+
+cd 20220204
+bash run
+cd ..
