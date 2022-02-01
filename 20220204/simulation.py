@@ -71,7 +71,7 @@ def simulation(beta_r, agentType, ga, fileName):
     # risk free interest rate depending on current S state 
     r_b = gkfe[:,1]/100
     # stock return depending on current S state
-    r_k = gkfe[:,2]/100
+    r_k = gkfe[:,2]/100 / 2
     # unemployment rate depending on current S state 
     Pe = gkfe[:,7:]/100
     Pe = Pe[:,::-1]
@@ -170,9 +170,9 @@ def simulation(beta_r, agentType, ga, fileName):
     # max rent unit
     Rl = 500
     # housing price constant 
-    pt = 2*250/1000 / 5 * 4.68
+    pt = 2*250/1000 / 5 * 4.70
     # 30k rent 1000 sf
-    pr = 2*10/1000 * 2 / 5 * 4.68
+    pr = 2*10/1000 * 2 / 5 * 4.70
     # constant cost 
     c_h = 5
     c_s = H*pt*0.4
