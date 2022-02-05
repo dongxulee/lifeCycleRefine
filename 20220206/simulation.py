@@ -47,13 +47,15 @@ def simulation(beta_r, agentType, ga, fileName):
     tau_L = 0.2
     tau_R = 0.1
     # number of states S
-    nS = 8
+    nS = 4
     # number of states e
     nE = 2
     # housing state
     nO = 2
     # experience state 
     nZ = 2
+    # number of stock returns
+    nK = 5 
     # probability of survival
     Pa = jnp.array(np.load("constant/prob.npy"))
 
@@ -61,17 +63,22 @@ def simulation(beta_r, agentType, ga, fileName):
         Economic state calibration 
     '''
     # Define transition matrix of economical states S
-    Ps = np.genfromtxt('constant/Ps.csv',delimiter=',')
-    Ps = jnp.array(Ps)
+    Ps = jnp.array([[0.666943845910281,       0.323002783576127,       0.006773126343361,       0.003280244170230],
+                    [0.242744495621321,       0.552652993374488,       0.062441903606298,       0.142160607397893],
+                    [0.142160607397893,       0.062441903606298,       0.552652993374488,       0.242744495621321],
+                    [0.003280244170230,       0.006773126343361,       0.323002783576127,       0.666943845910281]])
     # The possible GDP growth, stock return, bond return
-    gkfe = np.genfromtxt('constant/gkfe.csv',delimiter=',')
-    gkfe = jnp.array(gkfe)
+    gkfe = jnp.array([[1.15092702581186,0.35018029597671,7.45225509799324,1.96256037691487,2.70289403208730,4.08113333370979,6.38900780341802,6.58200153822790,75.7204565759835],
+                     [4.04067574816344,1.52018766753626,11.0127698466567,5.36898678622499,2.74215830217707,4.84525964423984,5.75640718766578,6.41575253485291,76.0184702813153],
+                     [1.15092702581186,3.94493112442431,8.01817936174009,1.90525394712031,3.52960682058264,7.20574800383753,6.28203807210335,7.44409304613654,77.1793373563495],
+                     [4.04067574816344,5.11493849598385,11.5786941104035,5.31168035643043,3.56887109067241,7.96987431436759,5.64943745635110,7.27784404276155,77.4773510616813]])
     # GDP growth depending on current S state
     gGDP = gkfe[:,0]/100
     # risk free interest rate depending on current S state 
     r_b = gkfe[:,1]/100
     # stock return depending on current S state
-    r_k = gkfe[:,2]/100 / 2
+    r_k = jnp.array([-0.09,  0.04,  0.12,  0.2 ,  0.33])
+    pk = jnp.array([0.2, 0.2, 0.2, 0.2, 0.2])
     # unemployment rate depending on current S state 
     Pe = gkfe[:,7:]/100
     Pe = Pe[:,::-1]
@@ -86,18 +93,18 @@ def simulation(beta_r, agentType, ga, fileName):
     # empirical econ
     empiricalEcon = pd.read_csv('constant/empiricalEcon.csv',delimiter=',')
     empiricalEcon = empiricalEcon.set_index("year")
-    empiricalEcon = empiricalEcon/100
+    empiricalEcon = (empiricalEcon/100)
     # match the empirical states in memoryState
-    memoryState = np.column_stack((gGDP, r_k, r_b))
+    memoryState = np.column_stack((gGDP, r_b))
     def similarity(actualState, memoryState = memoryState):
         '''
-            state is charactorized as 3 dim vector
+            state is charactorized as 2 dim vector
         '''
         diffState = np.sum(np.abs(actualState - memoryState), axis = 1)
         distance = np.min(diffState)
         state = np.argmin(diffState)
         return distance, state
-    similarity, imaginedEconState = np.vectorize(similarity, signature='(n)->(),()')(empiricalEcon.values)
+    _, imaginedEconState = np.vectorize(similarity, signature='(n)->(),()')(empiricalEcon.values[:,[0,2]])
     # generate economic states of a certain time window
     def generateEcon(yearBegin, yearCount,imaginedEconState,empiricalEcon):
         # single economy generation
@@ -345,26 +352,29 @@ def simulation(beta_r, agentType, ga, fileName):
         b = a[:,1]
         k = a[:,2]
         action = a[:,4]
-        w_next = ((1+r_b[s])*b + jnp.outer(k,(1+r_k)).T).T.flatten().repeat(nE)
-        ab_next = (1-x[4])*(t*(action == 1)).repeat(nS*nE) + x[4]*(x[1]*jnp.ones(w_next.size))
-        s_next = jnp.tile(jnp.arange(nS),nA).repeat(nE)
-        e_next = jnp.column_stack((e.repeat(nA*nS),(1-e).repeat(nA*nS))).flatten()
-        z_next = x[5]*jnp.ones(w_next.size) + ((1-x[5]) * (k > 0)).repeat(nS*nE)
+        # transition of o,z,ab
+        o_next_own = x[4] - action 
+        o_next_rent = action
+        o_next = (x[4] * o_next_own + (1-x[4]) * o_next_rent).repeat(nK*nS*nE)
+        z_next = (x[5]*jnp.ones(nA) + (1-x[5]) * (k > 0)).repeat(nK*nS*nE)
+        ab_next = ((1-x[4])*(t*(action == 1)) + x[4]*(x[1]*jnp.ones(nA))).repeat(nK*nS*nE)
+        # transition of w_next 
+        w_next = ((((1+r_b[s])*b).reshape((-1,1)) + jnp.outer(k,(1+r_k))).flatten()).repeat(nS*nE)
+        # transition of econ
+        s_next = jnp.tile(jnp.arange(nS),nA*nK).repeat(nE)
+        # transition of e 
+        e_next = jnp.column_stack((e.repeat(nA*nK*nS),(1-e).repeat(nA*nK*nS))).flatten()
         # job status changing probability and econ state transition probability
+        ps = Ps[s]
         pe = Pe[s, e]
-        ps = jnp.tile(Ps[s], nA)
-        prob_next = jnp.column_stack(((1-pe)*ps,pe*ps)).flatten()
-        # owner
-        o_next_own = (x[4] - action).repeat(nS*nE)
-        # renter
-        o_next_rent = action.repeat(nS*nE)
-        o_next = x[4] * o_next_own + (1-x[4]) * o_next_rent   
+        # job status changing probability
+        prob_next = jnp.tile(jnp.outer(jnp.outer(pk,ps).flatten(), jnp.array([1-pe,pe])).flatten(), nA)
         return jnp.column_stack((w_next,ab_next,s_next,e_next,o_next,z_next,prob_next))
 
     # used to calculate dot product
     @jit
     def dotProduct(p_next, uBTB):
-        return (p_next*uBTB).reshape((p_next.shape[0]//(nS*nE), (nS*nE))).sum(axis = 1)
+        return (p_next*uBTB).reshape((p_next.shape[0]//(nS*nE*nK), (nS*nE*nK))).sum(axis = 1)
 
 
     # define approximation of fit
@@ -433,8 +443,8 @@ def simulation(beta_r, agentType, ga, fileName):
     # stock return depending on current S state
     stockReturn = jnp.array(econRate[:,1])
 
-    @partial(jit, static_argnums=(0,1))
-    def transition_real(t,age,a,x):
+    @partial(jit, static_argnums=(0,))
+    def transition_real(t,a,x,key):
         '''
             Input:
                 x = [w,ab,s,e,o,z] single action 
@@ -457,20 +467,19 @@ def simulation(beta_r, agentType, ga, fileName):
         b = a[1]
         k = a[2]
         action = a[4]
-        w_next = ((1+bondReturn[t])*b + (1+stockReturn[t])*k).repeat(nE)
-        ab_next = (1-x[4])*(t*(action == 1)).repeat(nE) + x[4]*(x[1]*jnp.ones(nE))
-        s_next = econ[t+1].repeat(nE)
-        e_next = jnp.array([e,(1-e)])*(t+age-20<T_R) + jnp.array([0,0])*(t+age-20>=T_R)
-        z_next = x[5]*jnp.ones(nE) + ((1-x[5]) * (k > 0)).repeat(nE)
-        # job status changing probability and econ state transition probability
+        w_next = ((1+bondReturn[t])*b + (1+stockReturn[t])*k)
+        ab_next = (1-x[4])*(t*(action == 1)) + x[4]*x[1]
+        s_next = econ[t+1]
+        # job status changing probability
         pe = Pe[s, e]
-        prob_next = jnp.array([1-pe, pe])
-        # owner
-        o_next_own = (x[4] - action).repeat(nE)
-        # renter
-        o_next_rent = action.repeat(nE)
+        e_next = random.choice(a = jnp.array([e,(1-e)]), p = jnp.array([1-pe, pe]), key = key)
+        e_next = e_next * (t+1 < T_R)
+        z_next = x[5] + (1-x[5]) * (k > 0)
+        # owner and renter
+        o_next_own = (x[4] - action)
+        o_next_rent = action
         o_next = x[4] * o_next_own + (1-x[4]) * o_next_rent   
-        return jnp.column_stack((w_next,ab_next,s_next,e_next,o_next,z_next,prob_next))
+        return jnp.column_stack((w_next,ab_next,s_next,e_next,o_next,z_next))
 
     '''
         # [w,ab,s,e,o,z]
@@ -492,12 +501,9 @@ def simulation(beta_r, agentType, ga, fileName):
                 _,a = V_solve(t+age-20,Vgrid[:,:,:,:,:,:,t+age-20],x)
             else:
                 _,a = V_solve(t+age-20,Vgrid[:,:,:,:,:,:,t+age-20 + 1],x)
-            xp = transition_real(t,age,a,x)           
-            p = xp[:,-1]
-            x_next = xp[:,:-1]
             path.append(x)
-            move.append(a)
-            x = x_next[random.choice(a = nE, p=p, key = subkey)]
+            move.append(a)                
+            x = transition_real(t,a,x,subkey)           
         path.append(x)
         return jnp.array(path), jnp.array(move)
 

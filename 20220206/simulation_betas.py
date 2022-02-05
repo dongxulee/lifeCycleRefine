@@ -5,7 +5,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 AgentType = ["poorHigh", "poorLow", "richHigh", "richLow"]
-Beta_r = [0.01,0.05,0.10]
+Beta_r = [0.10]
 Gamma = [4.0]
 
 def mapOverBeta(beta_r):
@@ -27,5 +27,5 @@ def mapOverBeta(beta_r):
             print("gamma: ", gamma)
             simulation(beta_r, agentType, gamma, fileName)
 
-p = Pool(3)
+p = Pool(1)
 p.map(mapOverBeta, Beta_r)
