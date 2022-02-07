@@ -369,7 +369,7 @@ def simulation(beta_r, agentType, ga, fileName):
         pe = Pe[s, e]
         # job status changing probability
         prob_next = jnp.tile(jnp.outer(jnp.outer(pk,ps).flatten(), jnp.array([1-pe,pe])).flatten(), nA)
-        return jnp.column_stack((w_next,ab_next,s_next,e_next,o_next,z_next,prob_next))
+        return jnp.column_stack([w_next,ab_next,s_next,e_next,o_next,z_next,prob_next])
 
     # used to calculate dot product
     @jit
@@ -444,7 +444,7 @@ def simulation(beta_r, agentType, ga, fileName):
     stockReturn = jnp.array(econRate[:,1])
 
     @partial(jit, static_argnums=(0,))
-    def transition_real(t,a,x,key):
+    def transition_real(t,a,x,age,key):
         '''
             Input:
                 x = [w,ab,s,e,o,z] single action 
@@ -473,13 +473,13 @@ def simulation(beta_r, agentType, ga, fileName):
         # job status changing probability
         pe = Pe[s, e]
         e_next = random.choice(a = jnp.array([e,(1-e)]), p = jnp.array([1-pe, pe]), key = key)
-        e_next = e_next * (t+1 < T_R)
+        e_next = e_next * (t+age-20+1 < T_R)
         z_next = x[5] + (1-x[5]) * (k > 0)
         # owner and renter
         o_next_own = (x[4] - action)
         o_next_rent = action
         o_next = x[4] * o_next_own + (1-x[4]) * o_next_rent   
-        return jnp.column_stack((w_next,ab_next,s_next,e_next,o_next,z_next))
+        return jnp.column_stack([w_next,ab_next,s_next,e_next,o_next,z_next])[0]
 
     '''
         # [w,ab,s,e,o,z]
@@ -503,7 +503,7 @@ def simulation(beta_r, agentType, ga, fileName):
                 _,a = V_solve(t+age-20,Vgrid[:,:,:,:,:,:,t+age-20 + 1],x)
             path.append(x)
             move.append(a)                
-            x = transition_real(t,a,x,subkey)           
+            x = transition_real(t,a,x,age,subkey)           
         path.append(x)
         return jnp.array(path), jnp.array(move)
 

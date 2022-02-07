@@ -335,7 +335,7 @@ def solveMDP(beta_r, agentType, ga):
         pe = Pe[s, e]
         # job status changing probability
         prob_next = jnp.tile(jnp.outer(jnp.outer(pk,ps).flatten(), jnp.array([1-pe,pe])).flatten(), nA)
-        return jnp.column_stack((w_next,ab_next,s_next,e_next,o_next,z_next,prob_next))
+        return jnp.column_stack([w_next,ab_next,s_next,e_next,o_next,z_next,prob_next])
 
     # used to calculate dot product
     @jit

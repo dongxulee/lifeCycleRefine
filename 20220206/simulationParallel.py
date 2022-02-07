@@ -330,7 +330,7 @@ def simulation(beta_r, agentType, ga, fileName):
         pe = Pe[s, e]
         # job status changing probability
         prob_next = jnp.tile(jnp.outer(jnp.outer(pk,ps).flatten(), jnp.array([1-pe,pe])).flatten(), nA)
-        return jnp.column_stack((w_next,ab_next,s_next,e_next,o_next,z_next,prob_next))
+        return jnp.column_stack([w_next,ab_next,s_next,e_next,o_next,z_next,prob_next])
 
     # used to calculate dot product
     @jit
@@ -428,7 +428,7 @@ def simulation(beta_r, agentType, ga, fileName):
         o_next_own = (x[4] - action)
         o_next_rent = action
         o_next = x[4] * o_next_own + (1-x[4]) * o_next_rent   
-        return jnp.array([w_next,ab_next,s_next,e_next,o_next,z_next])
+        return jnp.column_stack([w_next,ab_next,s_next,e_next,o_next,z_next])[0]
 
 
     def simulation(key):
@@ -447,7 +447,7 @@ def simulation(beta_r, agentType, ga, fileName):
                 _,a = V_solve(t,Vgrid[:,:,:,:,:,:,t+1],x)
             path.append(x)
             move.append(a)
-            x = transition_real(t,a,x, econ[t], subkey)            
+            x = transition_real(t,a,x, econ[t], subkey)           
         path.append(x)
         return jnp.array(path), jnp.array(move)
 
