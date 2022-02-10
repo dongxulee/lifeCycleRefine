@@ -3,7 +3,7 @@ import os.path
 from multiprocessing import Pool 
 
 AgentType = ["poorHigh", "poorLow", "richHigh", "richLow"]
-Beta_r = [0.01,0.05,0.10]
+Beta_r = [0.10]
 Gamma = [4.0]
 
 def mapOverBeta(beta_r):
