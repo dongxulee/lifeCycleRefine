@@ -1,4 +1,16 @@
-python solveMDP_agentType.py
+python solveMDP_agentType1.py
+
+sleep 10
+
+python solveMDP_agentType2.py
+
+sleep 10
+
+python solveMDP_agentType3.py
+
+sleep 10
+
+python solveMDP_agentType4.py
 
 sleep 60
 

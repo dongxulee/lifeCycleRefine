@@ -1,0 +1,14 @@
+cd shutDownHousing
+python solveMDP_agentType.py
+cd ..
+sleep 60 
+
+cd shutDownRetirement
+python solveMDP_agentType.py
+cd ..
+sleep 60 
+
+cd shutDownBoth
+python solveMDP_agentType.py
+cd ..
+sleep 60 

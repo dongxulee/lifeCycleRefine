@@ -59,6 +59,7 @@ def simulation(beta_r, agentType, ga, fileName):
     '''
     # Define transition matrix of economical states S
     Ps = jnp.array(np.genfromtxt("constant/Ps.csv", delimiter=','))
+    Ps = (Ps - ((Ps.sum(axis = 1) - 1)/Ps.shape[0]).reshape((-1,1)))
     # The possible GDP growth, stock return, bond return
     gkfe = jnp.array(np.genfromtxt("constant/gkfe.csv", delimiter=','))
     # GDP growth depending on current S state

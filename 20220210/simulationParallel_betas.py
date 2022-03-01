@@ -26,5 +26,5 @@ def mapOverBeta(beta_r):
             print("gamma: ", gamma)
             simulation(beta_r, agentType, gamma, fileName)
 
-p = Pool(3)
+p = Pool(1)
 p.map(mapOverBeta, Beta_r)
