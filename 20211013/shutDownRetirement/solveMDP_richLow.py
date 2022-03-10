@@ -1,8 +1,9 @@
 import numpy as np
 import jax.numpy as jnp
-from jax.numpy import interp
-from jax import jit, partial, random, vmap
+from jax import jit, vmap
+from functools import partial
 from tqdm import tqdm
+import os.path
 import warnings
 warnings.filterwarnings("ignore")
 np.printoptions(precision=2)
