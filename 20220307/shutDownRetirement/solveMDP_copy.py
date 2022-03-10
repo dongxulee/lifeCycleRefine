@@ -5,7 +5,7 @@ from functools import partial
 from tqdm import tqdm
 import os.path
 
-beta_r = 0.04
+beta_r = 0.06
 agentType = "richLow"   
 '''
     Input: beta_r, agentType, gamma
