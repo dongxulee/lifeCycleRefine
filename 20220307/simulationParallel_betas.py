@@ -3,8 +3,8 @@ import os.path
 from multiprocessing import Pool 
 
 AgentType = ["poorHigh", "poorLow", "richHigh", "richLow"]
-Beta_r = [0.02,0.04,0.06,0.08,0.10]
-Gamma = [4.0, 4.5, 5.0, 5.5, 6.0]
+Beta_r = [0.06]
+Gamma = [4.0]
 
 def mapOverBeta(beta_r):
     for gamma in Gamma:
@@ -26,5 +26,5 @@ def mapOverBeta(beta_r):
             print("gamma: ", gamma)
             simulation(beta_r, agentType, gamma, fileName)
 
-p = Pool(5)
+p = Pool(1)
 p.map(mapOverBeta, Beta_r)
