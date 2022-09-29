@@ -12,9 +12,9 @@ def mapOverBeta(beta_r):
     for gamma in Gamma:
         for agentType in AgentType:
             fileName = agentType + "_" + str(beta_r) + "_" + str(gamma)
-            if os.path.exists("waseozcbkhm_" + fileName + ".npy"):
+            if os.path.exists("solution/waseozcbkhm_" + fileName + ".npy"):
                 break
-            if not os.path.exists(fileName + ".npy"):
+            if not os.path.exists("solution/" + fileName + ".npy"):
                 break
             '''
                 Constants 

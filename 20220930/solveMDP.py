@@ -381,7 +381,7 @@ def solveMDP(beta_r, agentType, ga):
         v = Q.max()
         return v
     ###################################solving the model################################################## 
-    fileName = agentType + "_" + str(beta_r) + "_" + str(gamma)
+    fileName = "solution/" + agentType + "_" + str(beta_r) + "_" + str(gamma)
     if os.path.exists(fileName + ".npy"):
         print("Model Solved! ")
     else:

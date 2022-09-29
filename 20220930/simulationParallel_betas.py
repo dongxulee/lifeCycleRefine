@@ -11,9 +11,9 @@ def mapOverBeta(beta_r):
         for agentType in AgentType:
             print(agentType)
             fileName = agentType + "_" + str(beta_r) + "_" + str(gamma)
-            if os.path.exists("parallel_waseozcbkhm_" + fileName + ".npy"):
+            if os.path.exists("solution/parallel_waseozcbkhm_" + fileName + ".npy"):
                 break 
-            if not os.path.exists(fileName + ".npy"):
+            if not os.path.exists("solution/" + fileName + ".npy"):
                 break
             '''
                 Constants 

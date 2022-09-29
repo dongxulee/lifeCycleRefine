@@ -375,7 +375,7 @@ def simulation(beta_r, agentType, ga, fileName):
         cbkha = actions[Q.argmax()]
         return v, cbkha
     ##################################################################################### main function part 
-    Vgrid = np.load(fileName + ".npy")
+    Vgrid = np.load("solution/" + fileName + ".npy")
     # total number of agents
     num = 10000
     '''
@@ -468,4 +468,4 @@ def simulation(beta_r, agentType, ga, fileName):
     _hs = Moves[:,:,3].T
     _ms = Ms[jnp.append(jnp.array([0]),jnp.arange(T_max)).reshape(-1,1) - jnp.array(_ab, dtype = jnp.int8)]*_os
     
-    np.save("parallel_waseozcbkhm_" + fileName, np.array([_ws,_ab,_ss,_es,_os,_zs,_cs,_bs,_ks,_hs,_ms]))
+    np.save("solution/parallel_waseozcbkhm_" + fileName, np.array([_ws,_ab,_ss,_es,_os,_zs,_cs,_bs,_ks,_hs,_ms]))
