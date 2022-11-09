@@ -2,7 +2,7 @@ from solveMDP import *
 from multiprocessing import Pool
 
 AgentType = ["poorHigh", "poorLow", "richHigh", "richLow"]
-Beta_r = [0.02,0.04,0.06,0.08,0.10]
+Beta_r = [0.02]
 Gamma = [4.0]
 
 
